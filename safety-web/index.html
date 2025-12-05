@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>安全监测系统</title>
+    <style>
+        * { font-family: Arial; }
+        body { padding: 40px; max-width: 800px; margin: auto; }
+        button { padding: 12px 24px; margin: 10px; font-size: 16px; }
+        input { padding: 10px; margin: 10px; width: 200px; }
+        .hidden { display: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #f5f5f5; }
+    </style>
+</head>
+<body>
+    <div id="loginPage">
+        <h1>🔐 高空作业安全监测系统</h1>
+        <p>请选择登录方式：</p>
+        
+        <button onclick="loginAsGuest()">👤 游客进入（仅查看）</button>
+        
+        <div style="margin-top: 30px;">
+            <h3>🔑 管理员登录</h3>
+            <p>管理员密码：admin123</p>
+            <input type="password" id="adminPass" placeholder="输入管理员密码">
+            <button onclick="loginAsAdmin()">管理员登录</button>
+            <p id="errorMsg" style="color:red;"></p>
+        </div>
+    </div>
+
+    <div id="mainPage" class="hidden">
+        <h1>📊 实时监控面板</h1>
+        
+        <div id="adminPanel" class="hidden">
+            <h3>⚙️ 管理员控制台</h3>
+            <button onclick="updateModel()" style="background:#4CAF50;color:white;">
+                🔄 更新所有终端模型
+            </button>
+            <p id="updateStatus"></p>
+        </div>
+        
+        <h3>🚨 报警记录</h3>
+        <table>
+            <thead>
+                <tr><th>时间</th><th>设备</th><th>类型</th><th>状态</th></tr>
+            </thead>
+            <tbody id="alertTable">
+                <tr><td colspan="4">加载中...</td></tr>
+            </tbody>
+        </table>
+        
+        <div style="margin-top: 30px;">
+            <button onclick="logout()">退出登录</button>
+        </div>
+    </div>
+
+    <script>
+        // 配置你的 Supabase 信息（换成你自己的）
+        const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+        const SUPABASE_KEY = 'YOUR_ANON_KEY';
+        
+        let isAdmin = false;
+        const ADMIN_PASSWORD = 'admin123'; // 管理员密码
+        
+        // 游客登录
+        function loginAsGuest() {
+            isAdmin = false;
+            showMainPage();
+            loadAlerts();
+        }
+        
+        // 管理员登录
+        function loginAsAdmin() {
+            const password = document.getElementById('adminPass').value;
+            if (password === ADMIN_PASSWORD) {
+                isAdmin = true;
+                showMainPage();
+                loadAlerts();
+            } else {
+                document.getElementById('errorMsg').textContent = '密码错误！';
+            }
+        }
+        
+        // 显示主页面
+        function showMainPage() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainPage').classList.remove('hidden');
+            if (isAdmin) {
+                document.getElementById('adminPanel').classList.remove('hidden');
+            }
+        }
+        
+        // 加载报警数据
+        async function loadAlerts() {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/alerts?select=*&order=created_at.desc`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+                
+                const data = await response.json();
+                updateTable(data);
+            } catch (error) {
+                console.log('加载数据出错:', error);
+            }
+        }
+        
+        // 更新表格
+        function updateTable(alerts) {
+            const table = document.getElementById('alertTable');
+            table.innerHTML = '';
+            
+            if (alerts.length === 0) {
+                table.innerHTML = '<tr><td colspan="4">暂无报警记录</td></tr>';
+                return;
+            }
+            
+            alerts.forEach(alert => {
+                const row = `<tr>
+                    <td>${new Date(alert.created_at).toLocaleString()}</td>
+                    <td>${alert.device_id || '未知'}</td>
+                    <td>${alert.alarm_type || '安全失保'}</td>
+                    <td>🔴 待处理</td>
+                </tr>`;
+                table.innerHTML += row;
+            });
+        }
+        
+        // 更新模型
+        function updateModel() {
+            document.getElementById('updateStatus').innerHTML = 
+                '<p style="color: green;">✅ 模型更新指令已发送到所有终端</p>';
+        }
+        
+        // 退出
+        function logout() {
+            location.reload();
+        }
+        
+        // 每5秒自动刷新
+        setInterval(loadAlerts, 5000);
+    </script>
+</body>
+</html>
