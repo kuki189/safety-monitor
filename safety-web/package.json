@@ -1,0 +1,9 @@
+{
+  "name": "safety-monitor",
+  "version": "1.0.0",
+  "description": "高空作业安全监测系统",
+  "scripts": {
+    "dev": "echo '这是一个静态网站，无需构建'",
+    "build": "echo '构建完成'"
+  }
+}
