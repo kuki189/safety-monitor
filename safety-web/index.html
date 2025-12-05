@@ -1,147 +1,789 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>安全监测系统</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高空作业安全监测系统</title>
     <style>
-        * { font-family: Arial; }
-        body { padding: 40px; max-width: 800px; margin: auto; }
-        button { padding: 12px 24px; margin: 10px; font-size: 16px; }
-        input { padding: 10px; margin: 10px; width: 200px; }
-        .hidden { display: none; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background: #f5f5f5; }
+        * {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .login-screen {
+            padding: 50px;
+            text-align: center;
+        }
+        
+        .login-box {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .login-option {
+            margin: 25px 0;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .login-option:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .login-option h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .login-option.guest {
+            background: #f8f9fa;
+        }
+        
+        .login-option.admin {
+            background: #f0f7ff;
+        }
+        
+        .password-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin: 15px 0;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .main-screen {
+            display: none;
+            padding: 30px;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .user-info {
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .admin-badge {
+            background: #28a745;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        
+        .guest-badge {
+            background: #6c757d;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        
+        .controls {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .controls.admin {
+            background: #e7f3ff;
+            border-left: 5px solid #007bff;
+        }
+        
+        .alert-table-container {
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .status.alarm {
+            background: #ffeaea;
+            color: #dc3545;
+        }
+        
+        .status.normal {
+            background: #e8f7e8;
+            color: #28a745;
+        }
+        
+        .thumbnail {
+            width: 120px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .thumbnail:hover {
+            transform: scale(1.05);
+            border-color: #667eea;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .modal-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            margin: 10px 0;
+            padding: 10px;
+            background: #ffeaea;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .login-screen {
+                padding: 20px;
+            }
+            
+            .stats {
+                flex-direction: column;
+            }
+            
+            th, td {
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="loginPage">
-        <h1>🔐 高空作业安全监测系统</h1>
-        <p>请选择登录方式：</p>
+    <div class="container">
+        <!-- 登录屏幕 -->
+        <div id="loginScreen" class="login-screen">
+            <header>
+                <h1>🏗️ 高空作业安全监测系统</h1>
+                <p>基于云-边-端协同的智能安全监控平台</p>
+            </header>
+            
+            <div class="login-box">
+                <h2 style="margin-bottom: 30px;">请选择登录方式</h2>
+                
+                <!-- 游客登录 -->
+                <div class="login-option guest" onclick="enterAsGuest()">
+                    <h3>👤 游客模式</h3>
+                    <p>仅查看报警记录，无操作权限</p>
+                    <button class="btn" style="margin-top: 15px;">游客进入</button>
+                </div>
+                
+                <!-- 管理员登录 -->
+                <div class="login-option admin">
+                    <h3>🔑 管理员登录</h3>
+                    <p>管理员密码：admin123</p>
+                    <input type="password" 
+                           id="adminPassword" 
+                           class="password-input" 
+                           placeholder="请输入管理员密码"
+                           onkeypress="if(event.key==='Enter') loginAsAdmin()">
+                    <div id="loginError" class="error-message"></div>
+                    <button class="btn" onclick="loginAsAdmin()">管理员登录</button>
+                </div>
+            </div>
+        </div>
         
-        <button onclick="loginAsGuest()">👤 游客进入（仅查看）</button>
-        
-        <div style="margin-top: 30px;">
-            <h3>🔑 管理员登录</h3>
-            <p>管理员密码：admin123</p>
-            <input type="password" id="adminPass" placeholder="输入管理员密码">
-            <button onclick="loginAsAdmin()">管理员登录</button>
-            <p id="errorMsg" style="color:red;"></p>
+        <!-- 主屏幕 -->
+        <div id="mainScreen" class="main-screen">
+            <!-- 顶部栏 -->
+            <div class="dashboard-header">
+                <div>
+                    <h2>📊 实时监控仪表板</h2>
+                    <p id="lastUpdate">最后更新：--:--:--</p>
+                </div>
+                <div class="user-info">
+                    <span id="userRole">用户</span>
+                    <button class="btn btn-secondary" onclick="logout()">退出登录</button>
+                </div>
+            </div>
+            
+            <!-- 统计信息 -->
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">今日报警</div>
+                    <div class="stat-value" id="todayAlerts">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">在线设备</div>
+                    <div class="stat-value" id="onlineDevices">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">处理率</div>
+                    <div class="stat-value" id="handleRate">0%</div>
+                </div>
+            </div>
+            
+            <!-- 管理员控制面板 -->
+            <div id="adminControls" class="controls admin" style="display: none;">
+                <h3>⚙️ 管理员控制台</h3>
+                <p style="margin-bottom: 15px;">高级操作权限，请谨慎使用</p>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button class="btn" onclick="updateAllModels()">
+                        🔄 更新所有终端模型
+                    </button>
+                    <button class="btn" onclick="clearOldData()">
+                        🗑️ 清理过期数据
+                    </button>
+                    <button class="btn" onclick="sendTestAlert()">
+                        🧪 发送测试报警
+                    </button>
+                </div>
+                <div id="controlStatus" style="margin-top: 15px;"></div>
+            </div>
+            
+            <!-- 报警记录表格 -->
+            <div class="alert-table-container">
+                <h3 style="margin-bottom: 15px;">🚨 实时报警记录</h3>
+                <div id="loadingIndicator" style="text-align: center; padding: 20px;">
+                    加载数据中...
+                </div>
+                <table id="alertTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>设备编号</th>
+                            <th>报警类型</th>
+                            <th>现场图片</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alertTableBody">
+                        <!-- 数据动态插入 -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 分页控制 -->
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="loadAlerts()">🔄 手动刷新</button>
+                <span style="margin: 0 15px; color: #666;">自动刷新间隔：5秒</span>
+            </div>
         </div>
     </div>
-
-    <div id="mainPage" class="hidden">
-        <h1>📊 实时监控面板</h1>
-        
-        <div id="adminPanel" class="hidden">
-            <h3>⚙️ 管理员控制台</h3>
-            <button onclick="updateModel()" style="background:#4CAF50;color:white;">
-                🔄 更新所有终端模型
-            </button>
-            <p id="updateStatus"></p>
-        </div>
-        
-        <h3>🚨 报警记录</h3>
-        <table>
-            <thead>
-                <tr><th>时间</th><th>设备</th><th>类型</th><th>状态</th></tr>
-            </thead>
-            <tbody id="alertTable">
-                <tr><td colspan="4">加载中...</td></tr>
-            </tbody>
-        </table>
-        
-        <div style="margin-top: 30px;">
-            <button onclick="logout()">退出登录</button>
+    
+    <!-- 图片查看模态框 -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <img id="modalImage" class="modal-img" src="" alt="现场图片">
+            <div style="padding: 15px; background: white; text-align: center;">
+                <button class="btn" onclick="closeModal()">关闭</button>
+            </div>
         </div>
     </div>
-
+    
     <script>
-        // 配置你的 Supabase 信息（换成你自己的）
-        const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+        // =================== 配置区域 ===================
+        // 在这里填写你的Supabase项目信息
+        const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
         const SUPABASE_KEY = 'YOUR_ANON_KEY';
+        // ==============================================
         
+        // 全局变量
         let isAdmin = false;
-        const ADMIN_PASSWORD = 'admin123'; // 管理员密码
+        const ADMIN_PASSWORD = 'admin123';
+        let currentUser = 'guest';
+        let refreshInterval;
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+        });
+        
+        // 检查是否已登录
+        function checkAuth() {
+            const savedUser = localStorage.getItem('safety_user');
+            if (savedUser) {
+                if (savedUser === 'admin') {
+                    isAdmin = true;
+                    currentUser = 'admin';
+                    showMainScreen();
+                } else {
+                    showMainScreen();
+                }
+            }
+        }
         
         // 游客登录
-        function loginAsGuest() {
+        function enterAsGuest() {
+            currentUser = 'guest';
             isAdmin = false;
-            showMainPage();
-            loadAlerts();
+            localStorage.setItem('safety_user', 'guest');
+            showMainScreen();
         }
         
         // 管理员登录
         function loginAsAdmin() {
-            const password = document.getElementById('adminPass').value;
+            const password = document.getElementById('adminPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            
             if (password === ADMIN_PASSWORD) {
+                currentUser = 'admin';
                 isAdmin = true;
-                showMainPage();
-                loadAlerts();
+                localStorage.setItem('safety_user', 'admin');
+                showMainScreen();
+                errorDiv.style.display = 'none';
             } else {
-                document.getElementById('errorMsg').textContent = '密码错误！';
+                errorDiv.textContent = '密码错误！请输入正确的管理员密码。';
+                errorDiv.style.display = 'block';
+                document.getElementById('adminPassword').value = '';
             }
         }
         
-        // 显示主页面
-        function showMainPage() {
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('mainPage').classList.remove('hidden');
+        // 显示主屏幕
+        function showMainScreen() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainScreen').style.display = 'block';
+            
+            // 更新用户信息
+            const userRole = document.getElementById('userRole');
             if (isAdmin) {
-                document.getElementById('adminPanel').classList.remove('hidden');
+                userRole.innerHTML = '👑 管理员 <span class="admin-badge">管理员</span>';
+                document.getElementById('adminControls').style.display = 'block';
+            } else {
+                userRole.innerHTML = '👤 游客 <span class="guest-badge">游客</span>';
             }
+            
+            // 加载数据
+            loadAlerts();
+            
+            // 开始自动刷新
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = setInterval(loadAlerts, 5000);
         }
         
         // 加载报警数据
         async function loadAlerts() {
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/alerts?select=*&order=created_at.desc`, {
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/alerts?select=*&order=created_at.desc&limit=50`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
                     }
-                });
+                );
+                
+                if (!response.ok) {
+                    throw new Error('获取数据失败');
+                }
                 
                 const data = await response.json();
+                updateDashboard(data);
                 updateTable(data);
+                document.getElementById('lastUpdate').textContent = 
+                    `最后更新：${new Date().toLocaleTimeString()}`;
+                
             } catch (error) {
-                console.log('加载数据出错:', error);
+                console.error('加载数据出错:', error);
+                showError('连接服务器失败，请检查网络连接');
             }
+        }
+        
+        // 更新仪表板统计
+        function updateDashboard(data) {
+            const today = new Date().toLocaleDateString();
+            const todayAlerts = data.filter(alert => 
+                new Date(alert.created_at).toLocaleDateString() === today
+            ).length;
+            
+            // 统计在线设备（假设最近5分钟有报警的设备为在线）
+            const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+            const onlineDevices = new Set(
+                data.filter(alert => new Date(alert.created_at) > fiveMinutesAgo)
+                    .map(alert => alert.device_id)
+            ).size;
+            
+            // 计算处理率（假设状态字段）
+            const handledAlerts = data.filter(alert => alert.status === 'handled').length;
+            const handleRate = data.length > 0 ? 
+                Math.round((handledAlerts / data.length) * 100) : 0;
+            
+            document.getElementById('todayAlerts').textContent = todayAlerts;
+            document.getElementById('onlineDevices').textContent = onlineDevices;
+            document.getElementById('handleRate').textContent = handleRate + '%';
         }
         
         // 更新表格
-        function updateTable(alerts) {
+        function updateTable(data) {
+            const tableBody = document.getElementById('alertTableBody');
+            const loadingIndicator = document.getElementById('loadingIndicator');
             const table = document.getElementById('alertTable');
-            table.innerHTML = '';
             
-            if (alerts.length === 0) {
-                table.innerHTML = '<tr><td colspan="4">暂无报警记录</td></tr>';
+            loadingIndicator.style.display = 'none';
+            table.style.display = 'table';
+            
+            if (data.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px;">
+                            📭 暂无报警记录
+                        </td>
+                    </tr>
+                `;
                 return;
             }
             
-            alerts.forEach(alert => {
-                const row = `<tr>
-                    <td>${new Date(alert.created_at).toLocaleString()}</td>
-                    <td>${alert.device_id || '未知'}</td>
-                    <td>${alert.alarm_type || '安全失保'}</td>
-                    <td>🔴 待处理</td>
-                </tr>`;
-                table.innerHTML += row;
+            let html = '';
+            data.forEach(alert => {
+                const time = new Date(alert.created_at).toLocaleString();
+                const deviceId = alert.device_id || '未知设备';
+                const alarmType = alert.alarm_type || '安全失保';
+                const imageUrl = alert.image_url || 'https://via.placeholder.com/400x300?text=无图片';
+                
+                html += `
+                    <tr>
+                        <td>${time}</td>
+                        <td><strong>${deviceId}</strong></td>
+                        <td>
+                            <span class="status alarm">${alarmType}</span>
+                        </td>
+                        <td>
+                            <img src="${imageUrl}" 
+                                 class="thumbnail" 
+                                 alt="现场图片"
+                                 onclick="showImage('${imageUrl}')"
+                                 onerror="this.src='https://via.placeholder.com/120x90?text=图片加载失败'">
+                        </td>
+                        <td>
+                            <span class="status normal">待处理</span>
+                        </td>
+                        <td>
+                            <button class="btn" style="padding: 5px 10px; font-size: 12px;"
+                                    onclick="handleAlert('${alert.id}')">
+                                标记处理
+                            </button>
+                        </td>
+                    </tr>
+                `;
             });
+            
+            tableBody.innerHTML = html;
         }
         
-        // 更新模型
-        function updateModel() {
-            document.getElementById('updateStatus').innerHTML = 
-                '<p style="color: green;">✅ 模型更新指令已发送到所有终端</p>';
+        // 显示错误信息
+        function showError(message) {
+            const tableBody = document.getElementById('alertTableBody');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px; color: #dc3545;">
+                        ❌ ${message}
+                    </td>
+                </tr>
+            `;
         }
         
-        // 退出
+        // 查看大图
+        function showImage(url) {
+            document.getElementById('modalImage').src = url;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+        
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+        
+        // 处理报警
+        function handleAlert(alertId) {
+            if (!isAdmin) {
+                alert('只有管理员可以标记处理报警！');
+                return;
+            }
+            
+            if (confirm('确定标记此报警为已处理吗？')) {
+                alert(`报警 ${alertId} 已标记为处理`);
+                // 这里可以添加更新数据库的代码
+            }
+        }
+        
+        // 管理员功能：更新所有模型
+        function updateAllModels() {
+            if (!isAdmin) {
+                alert('只有管理员可以更新模型！');
+                return;
+            }
+            
+            if (!confirm('确定要更新所有终端模型吗？此操作可能需要几分钟时间。')) {
+                return;
+            }
+            
+            const statusDiv = document.getElementById('controlStatus');
+            statusDiv.innerHTML = '<div style="color: #007bff;">🔄 正在发送更新指令...</div>';
+            
+            // 模拟更新过程
+            setTimeout(() => {
+                statusDiv.innerHTML = `
+                    <div style="color: #28a745;">
+                        ✅ 更新指令已发送到所有终端
+                        <br><small>预计将在5分钟内完成更新</small>
+                    </div>
+                `;
+                
+                // 3秒后清空状态
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                }, 3000);
+            }, 2000);
+        }
+        
+        // 管理员功能：清理旧数据
+        function clearOldData() {
+            if (!isAdmin) {
+                alert('只有管理员可以清理数据！');
+                return;
+            }
+            
+            if (!confirm('确定要清理30天前的数据吗？此操作不可恢复！')) {
+                return;
+            }
+            
+            const statusDiv = document.getElementById('controlStatus');
+            statusDiv.innerHTML = '<div style="color: #007bff;">🗑️ 正在清理旧数据...</div>';
+            
+            // 模拟清理过程
+            setTimeout(() => {
+                statusDiv.innerHTML = `
+                    <div style="color: #28a745;">
+                        ✅ 已成功清理旧数据
+                        <br><small>已释放存储空间</small>
+                    </div>
+                `;
+                
+                // 3秒后刷新数据
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                    loadAlerts();
+                }, 3000);
+            }, 2000);
+        }
+        
+        // 管理员功能：发送测试报警
+        async function sendTestAlert() {
+            if (!isAdmin) {
+                alert('只有管理员可以发送测试报警！');
+                return;
+            }
+            
+            try {
+                const testAlert = {
+                    device_id: 'test_device_001',
+                    alarm_type: '测试报警',
+                    image_url: 'https://via.placeholder.com/400x300/667eea/ffffff?text=测试图片'
+                };
+                
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/alerts`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(testAlert)
+                });
+                
+                if (response.ok) {
+                    const statusDiv = document.getElementById('controlStatus');
+                    statusDiv.innerHTML = '<div style="color: #28a745;">✅ 测试报警发送成功！页面将自动刷新...</div>';
+                    
+                    setTimeout(() => {
+                        statusDiv.innerHTML = '';
+                        loadAlerts();
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error('发送测试报警失败:', error);
+            }
+        }
+        
+        // 退出登录
         function logout() {
+            localStorage.removeItem('safety_user');
+            clearInterval(refreshInterval);
             location.reload();
         }
         
-        // 每5秒自动刷新
-        setInterval(loadAlerts, 5000);
+        // 键盘快捷键支持
+        document.addEventListener('keydown', function(event) {
+            // Ctrl+R 刷新数据
+            if (event.ctrlKey && event.key === 'r') {
+                event.preventDefault();
+                loadAlerts();
+            }
+            
+            // Esc 关闭模态框
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+            
+            // 在密码框按Enter登录
+            if (event.target.id === 'adminPassword' && event.key === 'Enter') {
+                loginAsAdmin();
+            }
+        });
     </script>
 </body>
 </html>
